@@ -1,0 +1,33 @@
+{
+  "name": "three-js-boilerplate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch",
+    "start": "webpack serve --config ./webpack.config.js --mode development",
+    "lint": "eslint -- ./src",
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dat.gui": "^0.7.7",
+    "gsap": "^3.5.1",
+    "lodash": "^4.17.20",
+    "three": "^0.122.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.8",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/preset-env": "^7.12.7",
+    "babel-loader": "^8.2.1",
+    "eslint": "^7.14.0",
+    "eslint-webpack-plugin": "^2.4.0",
+    "webpack": "^5.6.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

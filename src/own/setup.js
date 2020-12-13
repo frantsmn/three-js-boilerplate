@@ -19,7 +19,7 @@ const _camera = (width, height) => {
 	const FOV = 45;
 	const ASPECT = width / height;
 	const NEAR = 0.1;
-	const FAR = 100;
+	const FAR = 1000;
 	return new THREE.PerspectiveCamera(FOV, ASPECT, NEAR, FAR);
 }
 

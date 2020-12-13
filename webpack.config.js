@@ -15,10 +15,21 @@ module.exports = {
         quiet: false
     },
     module: {
+
+
         rules: [{
             test: /\.m?js$/,
             // exclude: /(node_modules)/,
             use: ['babel-loader']
+        },
+        {
+            test: /\.(frag|vert|glsl)$/,
+            use: [
+                {
+                    loader: 'glsl-shader-loader',
+                    options: {}
+                }
+            ]
         }]
     },
     // plugins: [new ESLintPlugin()],

@@ -11,6 +11,9 @@ const { renderer, scene, camera, controls, manager } = setup(container);
 import vertexShader from './own/shaders/vertex.glsl';
 import fragmentShader from './own/shaders/fragment.glsl';
 
+import vertexShader_sphere from './own/shaders/sphere/vertex.glsl';
+import fragmentShader_sphere from './own/shaders/sphere/fragment.glsl';
+
 // Libs
 import * as dat from 'dat.gui';
 const gui = new dat.GUI();
@@ -72,16 +75,18 @@ scene.add(pointLightHelper);
 	scene.add(plane);
 
 	/** Experiment plane */
-	const experimentGeometry = new THREE.PlaneBufferGeometry(3, 3, 40, 40);
+	const experimentGeometry = new THREE.PlaneBufferGeometry(3, 3, 30, 30);
 	let experimentMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x00ffff) });
 
 	// Shader Material
 	const waterTexture = new THREE.TextureLoader().load('./static/textures/water.jpg');
+	const explosionTexture = new THREE.TextureLoader().load('./static/textures/explosion.png');
 	waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
 	const uniforms = {
 		time: { value: 0.0 },
 		color: { value: new THREE.Color(0xfafafa) },
-		colorTexture: { value: waterTexture }
+		colorTexture: { value: waterTexture },
+		tExplosion: { value: explosionTexture }
 	}
 	experimentMaterial = new THREE.ShaderMaterial({
 		uniforms,
@@ -105,6 +110,20 @@ scene.add(pointLightHelper);
 	experimentPlane.material.side = THREE.DoubleSide;
 	scene.add(experimentPlane);
 
+	/** Experiment sphere */
+	const experimentSphereMaterial = new THREE.ShaderMaterial({
+		uniforms,
+		vertexShader: vertexShader_sphere,
+		fragmentShader: fragmentShader_sphere,
+	});
+
+	const experimentSphere = new THREE.Mesh(
+		new THREE.IcosahedronGeometry(2, 30),
+		experimentSphereMaterial
+	);
+	scene.add(experimentSphere);
+	experimentSphere.position.set(5, 2, 0);
+
 	/** GLTF model */
 	const gltf_tree = await loadGLTF('./static/gltf/tree/model.gltf', manager);
 	scene.add(gltf_tree.scene);
@@ -113,17 +132,19 @@ scene.add(pointLightHelper);
 		if (child.isMesh) {
 			child.castShadow = true;
 			child.receiveShadow = true;
-			child.position.x = -5;
-			scene.add(child);
+			child.position.x = -3;
 		}
 	});
 	//#endregion
 
-	
+
 	//#region Animate
 	function animate() {
 		uniforms.time.value = performance.now() * 0.003;
 
+		experimentSphere.rotation.x += 0.002;
+		experimentSphere.rotation.y += 0.002;
+		experimentSphere.rotation.z += 0.002;
 		stats.update();
 		controls.update();
 		renderer.render(scene, camera);
@@ -142,6 +163,7 @@ scene.add(pointLightHelper);
 	gui.remember(axesHelper);
 	gui.remember(gridHelper);
 	gui.remember(directionalLightHelper);
+	gui.remember(pointLightHelper);
 	gui.remember(plane);
 
 	cameraPosition.add(camera.position, 'x').listen().step(0.01);

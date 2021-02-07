@@ -6,7 +6,7 @@ function _renderer(options) {
 	return new THREE.WebGLRenderer(options || {
 		powerPreference: "high-performance",
 		antialias: true,
-		alpha: true, // Transparent canvas
+		// alpha: true, // Transparent canvas
 		// preserveDrawingBuffer: true // For screenshot
 	});
 }
@@ -19,7 +19,7 @@ const _camera = (width, height) => {
 	const FOV = 45;
 	const ASPECT = width / height;
 	const NEAR = 0.1;
-	const FAR = 1000;
+	const FAR = 500;
 	return new THREE.PerspectiveCamera(FOV, ASPECT, NEAR, FAR);
 }
 
@@ -53,13 +53,15 @@ export function setup(container, onResize = () => { }) {
 
 	renderer.setSize(aspectWidth, aspectHeight);
 
-	renderer.outputEncoding = THREE.sRGBEncoding;
-	renderer.toneMapping = THREE.ACESFilmicToneMapping;
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+	// renderer.outputEncoding = THREE.sRGBEncoding;
+	// renderer.toneMapping = THREE.ACESFilmicToneMapping;
+	// renderer.shadowMap.enabled = true;
+	// renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+	renderer.setPixelRatio(1);
 
 	camera.position.set(-4, 4, 10);
 	camera.lookAt(0, 0, 0);
+	camera.updateProjectionMatrix();
 
 	container.appendChild(renderer.domElement);
 

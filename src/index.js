@@ -1,63 +1,39 @@
-//#region Imports
 import * as THREE from 'three';
 
-// Setup
-import { setup } from './own/setup.js';
-import { loadGLTF, loadHDR } from './own/utils/loaders.js';
+import { setup } from './modules/setup.js';
+import { loadGLTF, loadHDR } from './modules/utils/loaders.js';
+import DevTools from "./modules/dev/devtools";
+
+import vertexShader_water from './shaders/water/vertex.glsl';
+import fragmentShader_water from './shaders/water/fragment.glsl';
+import vertexShader_sphere from './shaders/sphere/vertex.glsl';
+import fragmentShader_sphere from './shaders/sphere/fragment.glsl';
+
 const container = document.getElementById('canvas-container');
 const { renderer, scene, camera, controls, manager } = setup(container);
-
-// Shaders
-import vertexShader from './own/shaders/vertex.glsl';
-import fragmentShader from './own/shaders/fragment.glsl';
-
-import vertexShader_sphere from './own/shaders/sphere/vertex.glsl';
-import fragmentShader_sphere from './own/shaders/sphere/fragment.glsl';
-
-// Libs
-import * as dat from 'dat.gui';
-const gui = new dat.GUI();
-
-import Stats from 'three/examples/jsm/libs/stats.module.js';
-const stats = new Stats();
-container.appendChild(stats.dom);
-stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-//#endregion
-
-
-//#region Light
-scene.add(new THREE.AmbientLight(0xffffff, 0.1));
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-directionalLight.position.set(6, 8, -3);
-directionalLight.shadow.mapSize.width = directionalLight.shadow.mapSize.height = 2048;
-directionalLight.castShadow = true;
-scene.add(directionalLight);
-
-const pointLight = new THREE.PointLight(0xffffaa, 0.8);
-pointLight.position.set(0, 5, 0);
-pointLight.shadow.mapSize.width = pointLight.shadow.mapSize.height = 2048;
-pointLight.castShadow = true;
-scene.add(pointLight);
-//#endregion Light
-
-
-//#region Helpers
-const axesHelper = new THREE.AxesHelper(500);
-scene.add(axesHelper);
-
-const gridHelper = new THREE.GridHelper(500, 500, 0xffffff, 0x101010);
-scene.add(gridHelper)
-
-const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 1);
-scene.add(directionalLightHelper);
-
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 1);
-scene.add(pointLightHelper);
-//#endregion
-
+const devtools = new DevTools({
+	components: { container, renderer, scene, camera, controls },
+	stats: true,
+});
 
 (async function () {
+
+	//#region Light
+	scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+
+	const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+	directionalLight.position.set(6, 8, -3);
+	directionalLight.shadow.mapSize.width = directionalLight.shadow.mapSize.height = 2048;
+	directionalLight.castShadow = true;
+	scene.add(directionalLight);
+
+	const pointLight = new THREE.PointLight(0xffffaa, 0.8);
+	pointLight.position.set(0, 5, 0);
+	pointLight.shadow.mapSize.width = pointLight.shadow.mapSize.height = 2048;
+	pointLight.castShadow = true;
+	scene.add(pointLight);
+	//#endregion Light
+
 	//#region Items
 
 	/** HDR */
@@ -66,44 +42,47 @@ scene.add(pointLightHelper);
 	/** Plane */
 	const planeGeometry = new THREE.PlaneBufferGeometry(30, 30);
 	planeGeometry.rotateX(- Math.PI / 2);
-	const planeTexture = new THREE.TextureLoader().load('./static/textures/checkerboard.jpg');
-	planeTexture.repeat.x = planeTexture.repeat.y = 25;
+	// const planeTexture = new THREE.TextureLoader().load('./static/textures/checkerboard.jpg');
+	// planeTexture.repeat.x = planeTexture.repeat.y = 25;
+	const planeTexture = new THREE.TextureLoader().load('./static/textures/uvgrid.jpg');
 	planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping;
+	planeTexture.needsUpdate = true;
 	const plane = new THREE.Mesh(planeGeometry, new THREE.MeshPhongMaterial({ color: 0xffffff, map: planeTexture }));
 	plane.receiveShadow = true;
 	plane.name = 'plane';
 	scene.add(plane);
 
-	/** Experiment plane */
-	const experimentGeometry = new THREE.PlaneBufferGeometry(3, 3, 30, 30);
-	let experimentMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x00ffff) });
-
-	// Shader Material
+	// Uniforms
 	const waterTexture = new THREE.TextureLoader().load('./static/textures/water.jpg');
 	const explosionTexture = new THREE.TextureLoader().load('./static/textures/explosion.png');
 	waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
 	const uniforms = {
 		time: { value: 0.0 },
 		color: { value: new THREE.Color(0xfafafa) },
-		colorTexture: { value: waterTexture },
+		tWater: { value: waterTexture },
 		tExplosion: { value: explosionTexture }
 	}
-	experimentMaterial = new THREE.ShaderMaterial({
+
+	/** Experiment plane */
+	const experimentPlaneGeometry = new THREE.PlaneBufferGeometry(3, 3, 30, 30);
+	// const experimentPlaneMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x00ffff) });
+	const experimentPlaneMaterial = new THREE.ShaderMaterial({
 		uniforms,
-		vertexShader,
-		fragmentShader
+		vertexShader: vertexShader_water,
+		fragmentShader: fragmentShader_water
 	});
 	//Иногда необходимо для отображения текстуры
-	// experimentMaterial.needsUpdate = true; 
+	// experimentPlaneMaterial.needsUpdate = true;
+
 	// Генерация шума для каждой вершины
-	const displacement = new Float32Array(experimentGeometry.attributes.position.count);
+	const displacement = new Float32Array(experimentPlaneGeometry.attributes.position.count);
 	for (let i = 1; i < displacement.length; i++) {
 		displacement[i] = Math.random() * 0.2;
 	}
 	// Установка шума неизменным атрибутом
-	experimentGeometry.setAttribute('displacement', new THREE.BufferAttribute(displacement, 1));
+	experimentPlaneGeometry.setAttribute('displacement', new THREE.BufferAttribute(displacement, 1));
 
-	const experimentPlane = new THREE.Mesh(experimentGeometry, experimentMaterial)
+	const experimentPlane = new THREE.Mesh(experimentPlaneGeometry, experimentPlaneMaterial)
 	experimentPlane.position.setY(2);
 	experimentPlane.castShadow = true;
 	experimentPlane.receiveShadow = true;
@@ -116,7 +95,6 @@ scene.add(pointLightHelper);
 		vertexShader: vertexShader_sphere,
 		fragmentShader: fragmentShader_sphere,
 	});
-
 	const experimentSphere = new THREE.Mesh(
 		new THREE.IcosahedronGeometry(2, 30),
 		experimentSphereMaterial
@@ -127,7 +105,6 @@ scene.add(pointLightHelper);
 	/** GLTF model */
 	const gltf_tree = await loadGLTF('./static/gltf/tree/model.gltf', manager);
 	scene.add(gltf_tree.scene);
-
 	gltf_tree.scene.traverse(child => {
 		if (child.isMesh) {
 			child.castShadow = true;
@@ -137,7 +114,6 @@ scene.add(pointLightHelper);
 	});
 	//#endregion
 
-
 	//#region Animate
 	function animate() {
 		uniforms.time.value = performance.now() * 0.003;
@@ -145,37 +121,18 @@ scene.add(pointLightHelper);
 		experimentSphere.rotation.x += 0.002;
 		experimentSphere.rotation.y += 0.002;
 		experimentSphere.rotation.z += 0.002;
-		stats.update();
-		controls.update();
-		renderer.render(scene, camera);
+
+		//DEV
+		devtools.update();
+
+		//PROD
+		//controls.update();
+		//renderer.render(scene, camera);
+
 		requestAnimationFrame(animate);
 	}
 	animate();
-	//#endregion
 
-
-	//#region GUI
-	const cameraPosition = gui.addFolder('Camera position');
-	const stuff = gui.addFolder('Stuff');
-	const helpers = gui.addFolder('Helpers');
-
-	gui.remember(camera.position);
-	gui.remember(axesHelper);
-	gui.remember(gridHelper);
-	gui.remember(directionalLightHelper);
-	gui.remember(pointLightHelper);
-	gui.remember(plane);
-
-	cameraPosition.add(camera.position, 'x').listen().step(0.01);
-	cameraPosition.add(camera.position, 'y').listen().step(0.01);
-	cameraPosition.add(camera.position, 'z').listen().step(0.01);
-
-	helpers.add(axesHelper, 'visible').name("Axes");
-	helpers.add(gridHelper, 'visible').name("Grid");
-	helpers.add(directionalLightHelper, 'visible').name("Directional light");
-	helpers.add(pointLightHelper, 'visible').name("Point light");
-
-	stuff.add(plane, 'visible').name("Plane");
 	//#endregion
 
 })();

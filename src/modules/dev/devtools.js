@@ -11,7 +11,7 @@ export default class DevTools {
 		if (!components.scene) { console.error('[devtools.js]: "components.scene" property required!'); return; }
 		if (!components.camera) { console.error('[devtools.js]: "components.camera" property required!'); return; }
 		if (stats) this.addStats();
-		window.addEventListener('resize', this.onResize, false);
+		window.addEventListener('resize', () => this.onResize(), false);
 
 		//#region [debug camera]
 		const cameraSettings = {
@@ -138,6 +138,8 @@ export default class DevTools {
 		this.components.renderer.setSize(aspectWidth, aspectHeight);
 		this.activeCamera.aspect = aspectWidth / aspectHeight;
 		this.activeCamera.updateProjectionMatrix();
+		this.helpers.debugCamera.update();
+		this.helpers.camera.update();
 	}
 
 	set isDebugCameraActive(value) {
@@ -158,6 +160,7 @@ export default class DevTools {
 			this.__isDebugCameraActive = false;
 			this.hideHelpers();
 		}
+		this.onResize();
 	}
 
 	get isDebugCameraActive() {

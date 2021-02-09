@@ -1,7 +1,7 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import Stats from 'three/examples/jsm/libs/stats.module.js';
-import * as dat from 'dat.gui';
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import Stats from 'three/examples/jsm/libs/stats.module.js'
+import * as dat from 'dat.gui'
 
 export default class DevTools {
 	constructor({ components, stats }) {
@@ -107,7 +107,7 @@ export default class DevTools {
 
 		this.components.renderer.render(this.components.scene, this.activeCamera);
 		this.stats && this.stats.update();
-	};
+	}
 
 	hideHelpers() {
 		for (const key in this.helpers) {

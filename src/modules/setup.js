@@ -40,7 +40,7 @@ export {
 	_manager as manager
 }
 
-// Экспорт сетапа
+// Экспорт сетапа								//TODO onResize вынести в отдельный модуль
 export function setup(container, onResize = () => { }) {
 	const aspectWidth = container.offsetWidth;
 	const aspectHeight = container.offsetHeight;
@@ -65,6 +65,7 @@ export function setup(container, onResize = () => { }) {
 
 	container.appendChild(renderer.domElement);
 
+	//TODO вынести в отдельный модуль
 	window.addEventListener('resize', () => {
 		const aspectWidth = container.offsetWidth;
 		const aspectHeight = container.offsetHeight;

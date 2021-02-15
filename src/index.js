@@ -11,10 +11,7 @@ import fragmentShader_sphere from './shaders/sphere/fragment.glsl';
 
 const container = document.getElementById('canvas-container');
 const { renderer, scene, camera, controls, manager } = setup(container);
-const devtools = new DevTools({
-	components: { container, renderer, scene, camera, controls },
-	stats: true,
-});
+const devtools = new DevTools({ container, renderer, scene, camera, controls });
 
 (async function () {
 

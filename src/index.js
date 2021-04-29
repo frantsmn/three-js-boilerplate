@@ -9,9 +9,14 @@ const { renderer, scene, camera, controls, manager } = setup(container);
 import Preloader from './modules/utils/preloader';
 new Preloader({ manager });
 
-// Devtools
-import DevTools from "./modules/dev/devtools";
-const devtools = new DevTools({ container, renderer, scene, camera, controls });
+// Devtools 
+// eslint-disable-next-line no-undef
+if (process.env.NODE_ENV !== 'production') {
+	import('./modules/dev/devtools').then(module => {
+		const DevTools = module.default;
+		window.devtools = new DevTools({ container, renderer, scene, camera, controls });
+	});
+}
 
 // Objects
 import BaseObject from './objects/base';
@@ -41,16 +46,22 @@ const app = async () => {
 	function animate() {
 		uniforms.time.value = performance.now() * 0.003;
 
+		waterfall.position.y += Math.sin(performance.now() * 0.005) * 0.01;
+
 		fireball.rotation.x += 0.01;
 		fireball.rotation.y += 0.01;
 		fireball.rotation.z += 0.01;
 
-		//DEV
-		devtools.update();
+		// eslint-disable-next-line no-undef
+		if (process.env.NODE_ENV !== 'production') {
+			// DEVELOPMENT MODE
+			window.devtools.update();
+		} else {
+			// PRODUCTION MODE
+			controls.update();
+			renderer.render(scene, camera);
+		}
 
-		//PROD
-		//controls.update();
-		//renderer.render(scene, camera);
 		requestAnimationFrame(animate);
 	}
 	animate();

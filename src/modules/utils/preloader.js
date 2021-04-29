@@ -5,8 +5,6 @@ export default class Preloader {
 
         if (manager) {
 
-            console.log(this.preloaderElement);
-
             manager.onStart = (url, itemsLoaded, itemsTotal) => {
                 console.log('[preloader] > onStart: ', url, itemsLoaded, itemsTotal);
                 this.preloaderElement.classList.add('show');
@@ -27,7 +25,7 @@ export default class Preloader {
             manager.onError = (url) => {
                 console.error('[preloader] > onError: There was an error loading ' + url);
             };
-            
+
         }
     }
 }

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
+import { Interaction } from '../../node_modules/three.interaction/src/index';
+// import { Interaction } from 'three.interaction';
 
 function _renderer(options) {
 	return new THREE.WebGLRenderer(options || {
@@ -31,13 +32,18 @@ const _manager = () => {
 	return new THREE.LoadingManager();
 }
 
+const _interaction = (renderer, scene, camera) => {
+	return new Interaction(renderer, scene, camera)
+}
+
 // Экспорт отдельных модулей без инициализации
 export {
 	_renderer as renderer,
 	_scene as scene,
 	_camera as camera,
 	_controls as controls,
-	_manager as manager
+	_manager as manager,
+	_interaction as interaction
 }
 
 // Экспорт сетапа								//TODO onResize вынести в отдельный модуль
@@ -50,6 +56,7 @@ export function setup(container, onResize = () => { }) {
 	const camera = _camera(aspectWidth, aspectHeight);
 	const controls = _controls(camera, renderer.domElement);
 	const manager = _manager();
+	const interaction = _interaction(renderer, scene, camera);
 
 	renderer.setSize(aspectWidth, aspectHeight);
 
@@ -77,5 +84,5 @@ export function setup(container, onResize = () => { }) {
 		onResize();
 	}, false);
 
-	return { renderer, scene, camera, controls, manager }
+	return { renderer, scene, camera, controls, manager, interaction }
 }

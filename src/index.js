@@ -43,10 +43,18 @@ const app = async () => {
 
 	await baseInit();
 
+	waterfall.animate = true;
+	waterfall.on('click', (event) => {
+		console.log(event);
+		waterfall.animate = !waterfall.animate;
+	})
+
 	function animate() {
 		uniforms.time.value = performance.now() * 0.003;
 
-		waterfall.position.y += Math.sin(performance.now() * 0.005) * 0.01;
+		if (waterfall.animate) {
+			waterfall.position.y += Math.sin(performance.now() * 0.005) * 0.01;
+		}
 
 		fireball.rotation.x += 0.01;
 		fireball.rotation.y += 0.01;

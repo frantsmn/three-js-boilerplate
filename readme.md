@@ -2,3 +2,4 @@
 
     "dat.gui"
     "three"
+    "three.interaction"

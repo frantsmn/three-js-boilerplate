@@ -1,5 +1,15 @@
-import * as THREE from 'three';
-import { loadGLTF, loadHDR } from '../modules/utils/loaders.js';
+import {
+    AmbientLight,
+    DirectionalLight,
+    PointLight,
+    PlaneBufferGeometry,
+    TextureLoader,
+    RepeatWrapping,
+    Mesh,
+    MeshPhongMaterial
+} from 'three';
+
+import { loadGLTF, loadHDR } from '../modules/utils/async-loaders.js';
 
 export default class BaseObject {
     constructor({ scene, renderer, manager }) {
@@ -9,15 +19,15 @@ export default class BaseObject {
         this.renderer = renderer;
 
         //#region Light
-        scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+        scene.add(new AmbientLight(0xffffff, 0.1));
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        const directionalLight = new DirectionalLight(0xffffff, 0.8);
         directionalLight.position.set(6, 8, -3);
         directionalLight.shadow.mapSize.width = directionalLight.shadow.mapSize.height = 2048;
         directionalLight.castShadow = true;
         scene.add(directionalLight);
 
-        const pointLight = new THREE.PointLight(0xffffaa, 0.8);
+        const pointLight = new PointLight(0xffffaa, 0.8);
         pointLight.position.set(0, 5, 0);
         pointLight.shadow.mapSize.width = pointLight.shadow.mapSize.height = 2048;
         pointLight.castShadow = true;
@@ -25,16 +35,16 @@ export default class BaseObject {
         //#endregion Light
 
         /** Plane */
-        const planeGeometry = new THREE.PlaneBufferGeometry(30, 30);
+        const planeGeometry = new PlaneBufferGeometry(30, 30);
         planeGeometry.rotateX(- Math.PI / 2);
         // const planeTexture = new THREE.TextureLoader().load('./static/textures/checkerboard.jpg');
         // planeTexture.repeat.x = planeTexture.repeat.y = 25;
-        const planeTexture = new THREE.TextureLoader().load('./static/textures/uvgrid.jpg');
-        planeTexture.wrapS = planeTexture.wrapT = THREE.RepeatWrapping;
+        const planeTexture = new TextureLoader().load('./static/textures/uvgrid.jpg');
+        planeTexture.wrapS = planeTexture.wrapT = RepeatWrapping;
         planeTexture.needsUpdate = true;
-        const plane = new THREE.Mesh(planeGeometry, new THREE.MeshPhongMaterial({ color: 0xffffff, map: planeTexture }));
+        const plane = new Mesh(planeGeometry, new MeshPhongMaterial({ color: 0xffffff, map: planeTexture }));
         plane.receiveShadow = true;
-        plane.name = 'plane';
+        plane.name = 'floor';
         scene.add(plane);
 
         return { init: this.baseInit.bind(this) };

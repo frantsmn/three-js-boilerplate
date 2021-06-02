@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { ShaderMaterial, Mesh, IcosahedronGeometry } from 'three';
 
 import vertexShader_sphere from '../shaders/sphere/vertex.glsl';
 import fragmentShader_sphere from '../shaders/sphere/fragment.glsl';
@@ -6,13 +6,13 @@ import fragmentShader_sphere from '../shaders/sphere/fragment.glsl';
 export default class FireballObject {
     constructor({ scene, uniforms }) {
         /** Experiment sphere */
-        const experimentSphereMaterial = new THREE.ShaderMaterial({
+        const experimentSphereMaterial = new ShaderMaterial({
             uniforms,
             vertexShader: vertexShader_sphere,
             fragmentShader: fragmentShader_sphere,
         });
-        const fireball = new THREE.Mesh(
-            new THREE.IcosahedronGeometry(2, 30),
+        const fireball = new Mesh(
+            new IcosahedronGeometry(2, 30),
             experimentSphereMaterial
         );
         scene.add(fireball);

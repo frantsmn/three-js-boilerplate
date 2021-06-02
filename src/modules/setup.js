@@ -1,6 +1,8 @@
-import * as THREE from 'three';
+import { WebGLRenderer, Scene, PerspectiveCamera, LoadingManager } from 'three';
+// import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Interaction } from '../../node_modules/three.interaction/src/index';
+// const Interaction = require('three.interaction')
 // import { Interaction } from 'three.interaction';
 
 export default class Setup {
@@ -9,7 +11,7 @@ export default class Setup {
 		this.container = container;
 
 		this.renderer = (options) => {
-			return new THREE.WebGLRenderer(options || {
+			return new WebGLRenderer(options || {
 				powerPreference: "high-performance",
 				antialias: true,
 				// alpha: true, // Transparent canvas
@@ -18,7 +20,7 @@ export default class Setup {
 		}
 
 		this.scene = () => {
-			return new THREE.Scene();
+			return new Scene();
 		}
 
 		this.camera = (width, height) => {
@@ -26,7 +28,7 @@ export default class Setup {
 			const ASPECT = width / height;
 			const NEAR = 0.1;
 			const FAR = 500;
-			return new THREE.PerspectiveCamera(FOV, ASPECT, NEAR, FAR);
+			return new PerspectiveCamera(FOV, ASPECT, NEAR, FAR);
 		}
 
 		this.controls = (camera, element) => {
@@ -34,7 +36,7 @@ export default class Setup {
 		}
 
 		this.manager = () => {
-			return new THREE.LoadingManager();
+			return new LoadingManager();
 		}
 
 		this.interaction = (renderer, scene, camera) => {
@@ -43,7 +45,6 @@ export default class Setup {
 
 	}
 
-	// Экспорт сетапа								//TODO onResize вынести в отдельный модуль
 	init(onResize = () => { }) {
 		const aspectWidth = this.container.offsetWidth;
 		const aspectHeight = this.container.offsetHeight;
@@ -61,15 +62,14 @@ export default class Setup {
 		// renderer.toneMapping = THREE.ACESFilmicToneMapping;
 		// renderer.shadowMap.enabled = true;
 		// renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
-		renderer.setPixelRatio(1);
+		renderer.setPixelRatio(window.devicePixelRatio);
 
-		camera.position.set(-4, 4, 10);
-		camera.lookAt(0, 0, 0);
+		camera.position.set(-4, 2.5, 10);
+		camera.lookAt(0, 2.5, 0);
 		camera.updateProjectionMatrix();
 
 		this.container.appendChild(renderer.domElement);
 
-		//TODO вынести в отдельный модуль
 		window.addEventListener('resize', () => {
 			const aspectWidth = this.container.offsetWidth;
 			const aspectHeight = this.container.offsetHeight;

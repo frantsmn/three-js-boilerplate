@@ -1,12 +1,15 @@
-// const ESLintPlugin = require('eslint-webpack-plugin');
+/* eslint-disable no-undef */
 
 module.exports = {
     entry: {
         main: './src/index.js',
-
+    },
+    optimization: {
+        minimize: true,
+        usedExports: true,
     },
     devServer: {
-        historyApiFallback: true,
+        historyApiFallback: false,
         contentBase: './dist',
         open: true,
         compress: true,
@@ -14,13 +17,14 @@ module.exports = {
         port: 8080,
         quiet: false
     },
+    mode: 'production',
     module: {
-
-
         rules: [{
             test: /\.m?js$/,
-            // exclude: /(node_modules)/,
-            use: ['babel-loader']
+            exclude: /(node_modules)/,
+            use: {
+                loader: 'babel-loader',
+            }
         },
         {
             test: /\.(frag|vert|glsl)$/,

@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 
 // Setup
-import { setup } from './modules/setup';
+import Setup from './modules/setup';
 const container = document.getElementById('canvas-container');
-const { renderer, scene, camera, controls, manager } = setup(container);
+const setup = new Setup(container);
+const { renderer, scene, camera, controls, manager } = setup.init();
 
 // Preloader
 import Preloader from './modules/utils/preloader';

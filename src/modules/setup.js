@@ -3,86 +3,84 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Interaction } from '../../node_modules/three.interaction/src/index';
 // import { Interaction } from 'three.interaction';
 
-function _renderer(options) {
-	return new THREE.WebGLRenderer(options || {
-		powerPreference: "high-performance",
-		antialias: true,
-		// alpha: true, // Transparent canvas
-		// preserveDrawingBuffer: true // For screenshot
-	});
-}
+export default class Setup {
+	constructor(container) {
 
-const _scene = () => {
-	return new THREE.Scene();
-}
+		this.container = container;
 
-const _camera = (width, height) => {
-	const FOV = 45;
-	const ASPECT = width / height;
-	const NEAR = 0.1;
-	const FAR = 500;
-	return new THREE.PerspectiveCamera(FOV, ASPECT, NEAR, FAR);
-}
+		this.renderer = (options) => {
+			return new THREE.WebGLRenderer(options || {
+				powerPreference: "high-performance",
+				antialias: true,
+				// alpha: true, // Transparent canvas
+				// preserveDrawingBuffer: true // For screenshot
+			});
+		}
 
-const _controls = (camera, element) => {
-	return new OrbitControls(camera, element);
-}
+		this.scene = () => {
+			return new THREE.Scene();
+		}
 
-const _manager = () => {
-	return new THREE.LoadingManager();
-}
+		this.camera = (width, height) => {
+			const FOV = 45;
+			const ASPECT = width / height;
+			const NEAR = 0.1;
+			const FAR = 500;
+			return new THREE.PerspectiveCamera(FOV, ASPECT, NEAR, FAR);
+		}
 
-const _interaction = (renderer, scene, camera) => {
-	return new Interaction(renderer, scene, camera)
-}
+		this.controls = (camera, element) => {
+			return new OrbitControls(camera, element);
+		}
 
-// Экспорт отдельных модулей без инициализации
-export {
-	_renderer as renderer,
-	_scene as scene,
-	_camera as camera,
-	_controls as controls,
-	_manager as manager,
-	_interaction as interaction
-}
+		this.manager = () => {
+			return new THREE.LoadingManager();
+		}
 
-// Экспорт сетапа								//TODO onResize вынести в отдельный модуль
-export function setup(container, onResize = () => { }) {
-	const aspectWidth = container.offsetWidth;
-	const aspectHeight = container.offsetHeight;
+		this.interaction = (renderer, scene, camera) => {
+			return new Interaction(renderer, scene, camera)
+		}
 
-	const renderer = _renderer();
-	const scene = _scene();
-	const camera = _camera(aspectWidth, aspectHeight);
-	const controls = _controls(camera, renderer.domElement);
-	const manager = _manager();
-	const interaction = _interaction(renderer, scene, camera);
+	}
 
-	renderer.setSize(aspectWidth, aspectHeight);
+	// Экспорт сетапа								//TODO onResize вынести в отдельный модуль
+	init(onResize = () => { }) {
+		const aspectWidth = this.container.offsetWidth;
+		const aspectHeight = this.container.offsetHeight;
 
-	// renderer.outputEncoding = THREE.sRGBEncoding;
-	// renderer.toneMapping = THREE.ACESFilmicToneMapping;
-	// renderer.shadowMap.enabled = true;
-	// renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
-	renderer.setPixelRatio(1);
-
-	camera.position.set(-4, 4, 10);
-	camera.lookAt(0, 0, 0);
-	camera.updateProjectionMatrix();
-
-	container.appendChild(renderer.domElement);
-
-	//TODO вынести в отдельный модуль
-	window.addEventListener('resize', () => {
-		const aspectWidth = container.offsetWidth;
-		const aspectHeight = container.offsetHeight;
+		const renderer = this.renderer();
+		const scene = this.scene();
+		const camera = this.camera(aspectWidth, aspectHeight);
+		const controls = this.controls(camera, renderer.domElement);
+		const manager = this.manager();
+		const interaction = this.interaction(renderer, scene, camera);
 
 		renderer.setSize(aspectWidth, aspectHeight);
-		camera.aspect = aspectWidth / aspectHeight;
+
+		// renderer.outputEncoding = THREE.sRGBEncoding;
+		// renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		// renderer.shadowMap.enabled = true;
+		// renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+		renderer.setPixelRatio(1);
+
+		camera.position.set(-4, 4, 10);
+		camera.lookAt(0, 0, 0);
 		camera.updateProjectionMatrix();
 
-		onResize();
-	}, false);
+		this.container.appendChild(renderer.domElement);
 
-	return { renderer, scene, camera, controls, manager, interaction }
+		//TODO вынести в отдельный модуль
+		window.addEventListener('resize', () => {
+			const aspectWidth = this.container.offsetWidth;
+			const aspectHeight = this.container.offsetHeight;
+
+			renderer.setSize(aspectWidth, aspectHeight);
+			camera.aspect = aspectWidth / aspectHeight;
+			camera.updateProjectionMatrix();
+
+			onResize();
+		}, false);
+
+		return { renderer, scene, camera, controls, manager, interaction }
+	}
 }
